@@ -12,6 +12,7 @@ jobs:
     - uses: actions/checkout@v2
       with:
         token: ${{ secrets.GH_TOKEN }}
+        fetch-depth: 0
     - name: Set up JDK 13
       uses: actions/setup-java@v1
       with:
@@ -260,18 +261,21 @@ jobs:
           > _**Note:** All Docker images are availalbe [here](https://hub.docker.com/u/dirigiblelabs)_
 
           #### Available for download `*.war` packages:
+            - _**[server-all](https://github.com/eclipse/dirigible/releases/download/v${{ env.DIRIGIBLE_VERSION }}/server-all.zip) - Basic package - recommended for local test & development.**_
             - [anonymous-all](https://github.com/eclipse/dirigible/releases/download/v${{ env.DIRIGIBLE_VERSION }}/anonymous-all.zip) - Anonymous access.
             - [anonymous-runtime](https://github.com/eclipse/dirigible/releases/download/v${{ env.DIRIGIBLE_VERSION }}/anonymous-runtime.zip) - Anonymous access _(runtime only)_.
             - [sap-cf-all](https://github.com/eclipse/dirigible/releases/download/v${{ env.DIRIGIBLE_VERSION }}/sap-cf-all.zip) - SAP Cloud Platform - Cloud Foundry environment.
             - [sap-cf-runtime](https://github.com/eclipse/dirigible/releases/download/v${{ env.DIRIGIBLE_VERSION }}/sap-cf-runtime.zip) - SAP Cloud Platform - Cloud Foundry environment _(runtime only)_.
             - [desktop-all](https://github.com/eclipse/dirigible/releases/download/v${{ env.DIRIGIBLE_VERSION }}/desktop-all.zip) - Desktop package.
-            - _**[server-all](https://github.com/eclipse/dirigible/releases/download/v${{ env.DIRIGIBLE_VERSION }}/server-all.zip) - Basic package - recommended for local test & development.**_
             - [server-oauth](https://github.com/eclipse/dirigible/releases/download/v${{ env.DIRIGIBLE_VERSION }}/server-oauth.zip) - Basic package - recommended for local test & development, _**requires additional OAuth configurations.**_
             - [server-cms](https://github.com/eclipse/dirigible/releases/download/v${{ env.DIRIGIBLE_VERSION }}/server-cms.zip) - CMS package.
             - [server-database](https://github.com/eclipse/dirigible/releases/download/v${{ env.DIRIGIBLE_VERSION }}/server-database.zip) - Database package.
             - [server-javascript](https://github.com/eclipse/dirigible/releases/download/v${{ env.DIRIGIBLE_VERSION }}/server-javascript.zip) - JavaScript engine package.
             - [server-runtime](https://github.com/eclipse/dirigible/releases/download/v${{ env.DIRIGIBLE_VERSION }}/server-runtime.zip) - Basic package - recommended for local test & development _(runtime only)_.
             - [trial-all](https://github.com/eclipse/dirigible/releases/download/v${{ env.DIRIGIBLE_VERSION }}/trial-all.zip) - Trial package _(guest/nickname)_.
+            - [sap-all](https://github.com/eclipse/dirigible/releases/download/v${{ env.DIRIGIBLE_VERSION }}/sap-all.zip) - SAP BTP Neo Runtime package.
+            - [sap-all-ephemeral](https://github.com/eclipse/dirigible/releases/download/v${{ env.DIRIGIBLE_VERSION }}/sap-all-ephemeral.zip) - SAP BTP Neo Runtime package _(ephemeral database & repository)_.
+            - [sap-cms](https://github.com/eclipse/dirigible/releases/download/v${{ env.DIRIGIBLE_VERSION }}/sap-cms.zip) - SAP BTP Neo Runtime package _(content management only)_.
             
           > _**Note:** Unzip the downloaded file to extract the `ROOT.war` binary._
           
@@ -396,6 +400,48 @@ jobs:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: ./trial-all.zip
         asset_name: trial-all.zip
+        asset_content_type: application/zip
+
+    - name: Build Dirigible for SAP BTP Neo
+      run: mvn clean install -DskipTests -Djava.version=8 -Dmaven.javadoc.skip=true -Dmaven.compiler.source=1.8 -Dmaven.compiler.target=1.8
+
+    - name: Package SAP BTP Neo WAR files
+      run: |
+        zip --junk-paths sap-all releng/sap-all/target/ROOT.war
+        zip --junk-paths sap-all-ephemeral releng/sap-all-ephemeral/target/ROOT.war
+        zip --junk-paths sap-cms releng/sap-cms/target/ROOT.war
+
+    - name: Upload sap-all
+      id: upload-sap-all
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./sap-all.zip
+        asset_name: sap-all.zip
+        asset_content_type: application/zip
+
+    - name: Upload sap-all-ephemeral
+      id: upload-sap-all-ephemeral
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./sap-all-ephemeral.zip
+        asset_name: sap-all-ephemeral.zip
+        asset_content_type: application/zip
+
+    - name: Upload sap-cms
+      id: upload-sap-cms
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./sap-cms.zip
+        asset_name: sap-cms.zip
         asset_content_type: application/zip
 
 #----------------Publish GitHub Release------------------#

@@ -11,17 +11,18 @@
  */
 package org.eclipse.dirigible.database.sql.builders.table;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Stream;
-
 import org.eclipse.dirigible.database.sql.DataType;
 import org.eclipse.dirigible.database.sql.ISqlDialect;
 import org.eclipse.dirigible.database.sql.builders.AbstractCreateSqlBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * The Create Table Builder.
@@ -30,9 +31,9 @@ public abstract class AbstractTableBuilder<TABLE_BUILDER extends AbstractTableBu
 
 	private static final Logger logger = LoggerFactory.getLogger(AbstractTableBuilder.class);
 
-	private String table = null;
+	private String table;
 
-	private List<String[]> columns = new ArrayList<String[]>();
+	private List<String[]> columns = new ArrayList<>();
 
 	/**
 	 * Instantiates a new creates the table builder.
@@ -89,7 +90,7 @@ public abstract class AbstractTableBuilder<TABLE_BUILDER extends AbstractTableBu
 		logger.trace("column: " + name + ", type: " + (type != null ? type.name() : null) + ", isPrimaryKey: " + isPrimaryKey + ", isNullable: "
 				+ isNullable + ", isUnique: " + isUnique + ", isIdentity: " + isIdentity + ", args: " + Arrays.toString(args));
 		String[] definition = new String[] { name, getDialect().getDataTypeName(type) };
-		String[] column = null;
+		String[] column;
 		if (isIdentity) {
 			column = Stream.of(definition, args, new String[] { getDialect().getIdentityArgument() }).flatMap(Stream::of).toArray(String[]::new);
 		} else {
@@ -2216,6 +2217,9 @@ public abstract class AbstractTableBuilder<TABLE_BUILDER extends AbstractTableBu
 	protected String traverseColumns() {
 		StringBuilder snippet = new StringBuilder();
 		snippet.append(SPACE);
+		List<String[]> allPrimaryKeys = this.columns.stream().filter(el -> Arrays.stream(el).anyMatch(x -> x.equals(getDialect().getPrimaryKeyArgument()))).collect(Collectors.toList());
+		boolean isCompositeKey = allPrimaryKeys.size() > 1;
+
 		for (String[] column : this.columns) {
 			boolean first = true;
 			for (String arg : column) {
@@ -2225,11 +2229,14 @@ public abstract class AbstractTableBuilder<TABLE_BUILDER extends AbstractTableBu
 					first = false;
 					continue;
 				}
+				if (isCompositeKey && arg.equals(getDialect().getPrimaryKeyArgument())) {
+					continue;
+				}
 				snippet.append(arg).append(SPACE);
 			}
 			snippet.append(COMMA).append(SPACE);
 		}
-		return snippet.toString().substring(0, snippet.length() - 2);
+		return snippet.substring(0, snippet.length() - 2);
 	}
 	
 	/**
@@ -2245,7 +2252,7 @@ public abstract class AbstractTableBuilder<TABLE_BUILDER extends AbstractTableBu
 			snippet.append(columnName).append(SPACE);
 			snippet.append(COMMA).append(SPACE);
 		}
-		return snippet.toString().substring(0, snippet.length() - 2);
+		return snippet.substring(0, snippet.length() - 2);
 	}
 
 	/**
@@ -2262,7 +2269,7 @@ public abstract class AbstractTableBuilder<TABLE_BUILDER extends AbstractTableBu
 			String columnName = (isCaseSensitive()) ? encapsulate(column) : column;
 			snippet.append(columnName).append(SPACE).append(COMMA).append(SPACE);
 		}
-		return snippet.toString().substring(0, snippet.length() - 2);
+		return snippet.substring(0, snippet.length() - 2);
 	}
 
 	/**

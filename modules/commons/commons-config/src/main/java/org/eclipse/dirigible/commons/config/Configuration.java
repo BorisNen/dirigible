@@ -189,6 +189,18 @@ public class Configuration {
 	}
 
 	/**
+	 * Setter for the property's key and value. Sets the new value, only if the key value is null.
+	 *
+	 * @param key   the key
+	 * @param value the value
+	 */
+	public static void setIfNull(String key, String value) {
+		if (get(key) == null) {
+			set(key, value);
+		}
+	}
+
+	/**
 	 * Remove property
 	 * 
 	 * @param key the key
@@ -432,5 +444,25 @@ public class Configuration {
 			"DIRIGIBLE_INSTANCE_NAME",
 			"DIRIGIBLE_SPARK_CLIENT_URI"
 	};
+
+	public static String getOS() {
+		return System.getProperty("os.name").toLowerCase();
+	}
+
+	public static boolean isOSWindows() {
+		return (getOS().indexOf("win") >= 0);
+	}
+
+	public static boolean isOSMac() {
+		return (getOS().indexOf("mac") >= 0);
+	}
+
+	public static boolean isOSUNIX() {
+		return (getOS().indexOf("nix") >= 0 || getOS().indexOf("nux") >= 0 || getOS().indexOf("aix") > 0);
+	}
+
+	public static boolean isOSSolaris() {
+		return (getOS().indexOf("sunos") >= 0);
+	}
 
 }

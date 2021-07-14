@@ -494,7 +494,6 @@ WorkspaceTreeAdapter.prototype.renameNode = function(node, oldName, newName){
 		this.workspaceService.rename.apply(this.workspaceService, [oldName, newName, node.original._file.path])
 			.then(function(data){
 				this.messageHub.announceFileRenamed(node.original._file, oldName, newName);
-				//this.jstree.reference(node).select_node(node);
 			}.bind(this))
 			.finally(function() {
 				this.refresh();
@@ -507,12 +506,13 @@ WorkspaceTreeAdapter.prototype.moveNode = function(sourceParentNode, node){
 	var sourcepath = sourceParentNode.original._file.path.substring(this.workspaceName.length+1);
 	var tagetParentNode = this.jstree.get_node(node.parent);
 	var targetpath = tagetParentNode.original._file.path.substring(this.workspaceName.length+1);
+	var workspaceName = this.workspaceName;
 	var self = this;
-	return this.workspaceService.move(node.text, sourcepath, targetpath, this.workspaceName)
+	return this.workspaceService.move(node.text, sourcepath, targetpath, workspaceName)
 			.then(function(sourceParentNode, tagetParentNode){
 				self.refresh(sourceParentNode, true);
 				self.refresh(tagetParentNode, true).then(function(){
-					self.messageHub.announceFileMoved(targetpath+'/'+node.text, sourcepath, targetpath);
+					self.messageHub.announceFileMoved(node.text, sourcepath, targetpath, workspaceName);
 				});
 			}.bind(this, sourceParentNode, tagetParentNode))
 			.finally(function() {
@@ -546,7 +546,6 @@ WorkspaceTreeAdapter.prototype.openWith = function(node, editor){
 	this.messageHub.announceFileOpen(node, editor);
 };
 WorkspaceTreeAdapter.prototype.clickNode = function(node){
-	//var type = node.original.type;
 	this.messageHub.announceFileSelected(node.original._file);
 };
 WorkspaceTreeAdapter.prototype.raw = function(){
@@ -624,12 +623,10 @@ WorkspaceTreeAdapter.prototype.generateFile = function(resource, scope){
 		segments = segments.splice(3, segments.length);
 		this.workspaceController.fileName = new UriBuilder().path(segments).path("fileName").build();
 		scope.$apply();
-//		$('#generateFromTemplate').click();
         this.workspaceController.generateFromTemplate(scope);
 	} else {
 		this.workspaceController.fileName = segments[segments.length-1];
 		scope.$apply();
-//		$('#generateFromModel').click();
 		this.workspaceController.generateFromModel(scope);
 	}
 };
@@ -721,11 +718,12 @@ angular.module('workspace', ['workspace.config', 'ideUiCore', 'ngAnimate', 'ngSa
 		};
 		this.send('file.renamed', data);
 	};	
-	var announceFileMoved = function(fileDescriptor, sourcepath, targetpath){
+	var announceFileMoved = function(fileDescriptor, sourcepath, targetpath, workspace){
 		var data = {
 			"file": fileDescriptor,
 			"sourcepath": sourcepath,
-			"targetpath": targetpath
+			"targetpath": targetpath,
+			"workspace": workspace
 		};
 		this.send('file.moved', data);
 	};

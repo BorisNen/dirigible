@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.eclipse.dirigible</groupId>
 		<artifactId>dirigible-engine-parent</artifactId>
-		<version>5.12.0-SNAPSHOT</version>
+		<version>6.0.0-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
@@ -238,27 +238,27 @@
 		<dependency>
 			<groupId>org.eclipse.dirigible</groupId>
 			<artifactId>dirigible-commons-api</artifactId>
-			<version>5.12.0-SNAPSHOT</version>
+			<version>6.0.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.dirigible</groupId>
 			<artifactId>dirigible-repository-api</artifactId>
-			<version>5.12.0-SNAPSHOT</version>
+			<version>6.0.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.dirigible</groupId>
 			<artifactId>dirigible-api-facade-http</artifactId>
-			<version>5.12.0-SNAPSHOT</version>
+			<version>6.0.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.dirigible</groupId>
 			<artifactId>dirigible-api-facade-core</artifactId>
-			<version>5.12.0-SNAPSHOT</version>
+			<version>6.0.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.dirigible</groupId>
 			<artifactId>dirigible-engine-javascript</artifactId>
-			<version>5.12.0-SNAPSHOT</version>
+			<version>6.0.0-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
@@ -271,24 +271,24 @@
 		<dependency>
 			<groupId>org.eclipse.dirigible</groupId>
 			<artifactId>dirigible-commons-test</artifactId>
-			<version>5.12.0-SNAPSHOT</version>
+			<version>6.0.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.dirigible</groupId>
 			<artifactId>dirigible-repository-local</artifactId>
-			<version>5.12.0-SNAPSHOT</version>
+			<version>6.0.0-SNAPSHOT</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.dirigible</groupId>
 			<artifactId>dirigible-database-derby</artifactId>
-			<version>5.12.0-SNAPSHOT</version>
+			<version>6.0.0-SNAPSHOT</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.dirigible</groupId>
 			<artifactId>dirigible-api-facade-tests</artifactId>
-			<version>5.12.0-SNAPSHOT</version>
+			<version>6.0.0-SNAPSHOT</version>
 			<scope>test</scope>
 		</dependency>
 <!--		<dependency>-->
@@ -321,6 +321,13 @@
 		</dependency>
 		<dependency>
 			<groupId>org.testcontainers</groupId>
+			<artifactId>cassandra</artifactId>
+			<version>1.15.3</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.testcontainers</groupId>
 			<artifactId>elasticsearch</artifactId>
 			<version>1.15.3</version>
 			<scope>test</scope>
@@ -329,6 +336,6 @@
 
 	<properties>
 		<graalvm.version>21.0.0</graalvm.version>
-		<license.header.location>../../../license-header.txt</license.header.location>
+		<license.header.location>../../../licensing-header.txt</license.header.location>
 	</properties>
 </project>
